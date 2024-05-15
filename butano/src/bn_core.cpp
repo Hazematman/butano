@@ -309,24 +309,29 @@ namespace
     }
 }
 
-void _vblank_handler();
+void default_vblank_handler();
 
 void init()
 {
-    init(nullopt, string_view());
+    init(nullopt, string_view(), default_vblank_handler);
 }
 
 void init(const optional<color>& transparent_color)
 {
-    init(transparent_color, string_view());
+    init(transparent_color, string_view(), default_vblank_handler);
 }
 
 void init(const string_view& keypad_commands)
 {
-    init(nullopt, keypad_commands);
+    init(nullopt, keypad_commands, default_vblank_handler);
 }
 
-void init(const optional<color>& transparent_color, const string_view& keypad_commands)
+void init(void (*onVBlank)())
+{
+    init(nullopt, string_view(), onVBlank);
+}
+
+void init(const optional<color>& transparent_color, const string_view& keypad_commands, void (*onVBlank)())
 {
     new(&data) static_data();
 
@@ -369,7 +374,7 @@ void init(const optional<color>& transparent_color, const string_view& keypad_co
     keypad_manager::init(keypad_commands);
 
     // Set our own vblank handler so update doesn't freeze
-    hw::irq::set_isr(hw::irq::id::VBLANK, _vblank_handler);
+    hw::irq::set_isr(hw::irq::id::VBLANK, onVBlank);
     hw::irq::enable(hw::irq::id::VBLANK);
 
     // First update:
@@ -449,7 +454,7 @@ void on_vblank()
 }
 
 
-void _vblank_handler()
+void default_vblank_handler()
 {
     on_vblank();
 
