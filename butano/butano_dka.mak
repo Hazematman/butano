@@ -23,7 +23,8 @@ include $(BN_TOOLS)/custom_base_rules.mak
 #---------------------------------------------------------------------------------------------------------------------
 # Butano custom GBFS .out.gba rule with spaces allowed:
 #---------------------------------------------------------------------------------------------------------------------
-%.out.gba: %.gba
+GBFS_FILES := $(wildcard $(CURDIR)/../gbfs_files/*)
+%.out.gba: %.gba $(GBFS_FILES)
 	@echo Generating $(notdir $@)...
 	$(SILENTCMD)gbfs $(CURDIR)/files.gbfs $(CURDIR)/../gbfs_files/*
 	$(SILENTCMD)bash $(LIBBUTANOABS)/package.sh $< $(CURDIR)/files.gbfs $@
